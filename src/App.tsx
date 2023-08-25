@@ -5,6 +5,7 @@ import useSWR from "swr";
 function App() {
   const [search, setSearch] = useState("");
   const [searchKeyUp, setSearchKeyUp] = useState("");
+  const [pagination, setPagination] = useState(1);
 
   const url = useMemo(() => {
     const searchParam = new URLSearchParams();
@@ -94,6 +95,11 @@ function App() {
                 {candidate}
               </button>
             ))}
+          </div>
+
+          {/* Footer */}
+          <div className="w-full h-full flex justify-center !mt-[50px]">
+            <p className="text-white text-xl">Made By <a className="font-bold underline hover:no-underline" href="https://www.rhafaelbijaksana.site">Elbi</a></p>
           </div>
         </div>
       </div>
