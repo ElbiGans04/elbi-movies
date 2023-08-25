@@ -9,11 +9,16 @@ function App() {
 
   const url = useMemo(() => {
     const searchParam = new URLSearchParams();
-    searchParam.set("query", searchKeyUp);
-    return searchKeyUp
-      ? `${import.meta.env.VITE_MOVIE_SEARCH}${searchParam.toString()}`
-      : import.meta.env.VITE_MOVIE_LIST_ALL;
-  }, [searchKeyUp]);
+    searchParam.set("page", pagination.toString());
+    if (searchKeyUp) {
+      searchParam.set("query", searchKeyUp);
+    }
+    return `${
+      searchKeyUp
+        ? import.meta.env.VITE_MOVIE_SEARCH
+        : import.meta.env.VITE_MOVIE_LIST_ALL
+    }${searchParam.toString()}`;
+  }, [searchKeyUp, pagination]);
 
   const { data } = useSWR(url, fetcher);
 
@@ -87,19 +92,41 @@ function App() {
 
           {/* Pagination */}
           <div className="w-full h-full grid grid-cols-2 gap-[20px] justify-end">
-            {["Previous", "Next"].map((candidate) => (
-              <button
-                className="bg-[#205295] p-[16px] text-white shadow hover:opacity-[0.8] active:scale-[0.8] active:opacity-[0.5]"
-                key={candidate}
-              >
-                {candidate}
-              </button>
-            ))}
+            <button
+              className={`bg-[#205295] p-[16px] text-white shadow ${
+                pagination !== 1 ?
+                `hover:opacity-[0.8] active:scale-[0.8] active:opacity-[0.5]`
+                : `opacity-[0.5]`
+              }`}
+              onClick={() => setPagination((state) => state - 1)}
+              disabled={pagination === 1}
+            >
+              Previous
+            </button>
+            <button
+               className={`bg-[#205295] p-[16px] text-white shadow ${
+                (data?.total_pages > 500 ? 500 : data?.total_pages) !== pagination ?
+                `hover:opacity-[0.8] active:scale-[0.8] active:opacity-[0.5]`
+                : `opacity-[0.5]`
+              }`}
+              onClick={() => setPagination((state) => state + 1)}
+              disabled={(data?.total_pages > 500 ? 500 : data?.total_pages) === pagination}
+            >
+              Next
+            </button>
           </div>
 
           {/* Footer */}
           <div className="w-full h-full flex justify-center !mt-[50px]">
-            <p className="text-white text-xl">Made By <a className="font-bold underline hover:no-underline" href="https://www.rhafaelbijaksana.site">Elbi</a></p>
+            <p className="text-white text-xl">
+              Made By{" "}
+              <a
+                className="font-bold underline hover:"
+                href="https://www.rhafaelbijaksana.site"
+              >
+                Elbi
+              </a>
+            </p>
           </div>
         </div>
       </div>
