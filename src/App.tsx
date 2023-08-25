@@ -1,6 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import fetcher from "./utils/fetcher";
 import useSWR from "swr";
+import Button from "./components/button";
+
+interface Data {
+  results: Array<{
+    id: number;
+    title: string;
+    poster_path: string;
+    release_date: string;
+  }>;
+  total_pages: number;
+}
 
 function App() {
   const [search, setSearch] = useState("");
@@ -20,7 +31,7 @@ function App() {
     }${searchParam.toString()}`;
   }, [searchKeyUp, pagination]);
 
-  const { data, isLoading } = useSWR(url, fetcher);
+  const { data, isLoading } = useSWR<Data>(url, fetcher);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -39,7 +50,9 @@ function App() {
       <div className="xl:max-w-5xl lg:max-w-3xl px-[50px] w-full h-full">
         <div className="w-full h-full space-y-[30px]">
           <div className="space-y-[10px]">
-            <h1 className="text-white xl:text-7xl text-3xl md:text-4xl font-bold">Elbi Movies</h1>
+            <h1 className="text-white xl:text-7xl text-3xl md:text-4xl font-bold">
+              Elbi Movies
+            </h1>
             <p className="text-white xl:text-2xl md:text-xl text-lg">
               Search any movie for{" "}
               <span className="font-bold underline">free</span>
@@ -105,7 +118,9 @@ function App() {
                       />
                     </div>
                     <div className="p-[16px]">
-                      <p className="text-white text-xl xl:text-2xl">{candidate.title}</p>
+                      <p className="text-white text-xl xl:text-2xl">
+                        {candidate.title}
+                      </p>
                       <p className="text-white text-sm xl:text-md">
                         {candidate.release_date}
                       </p>
@@ -117,32 +132,24 @@ function App() {
 
           {/* Pagination */}
           <div className="w-full h-full grid grid-cols-2 gap-[20px] justify-end">
-            <button
-              className={`bg-[#205295] p-[16px] text-white shadow ${
-                pagination !== 1
-                  ? `hover:opacity-[0.8] active:scale-[0.8] active:opacity-[0.5]`
-                  : `opacity-[0.5]`
-              }`}
-              onClick={() => setPagination((state) => state - 1)}
+            <Button
               disabled={pagination === 1}
+              onClick={() => setPagination((state) => state - 1)}
             >
               Previous
-            </button>
-            <button
-              className={`bg-[#205295] p-[16px] text-white shadow ${
-                (data?.total_pages > 500 ? 500 : data?.total_pages) !==
-                pagination
-                  ? `hover:opacity-[0.8] active:scale-[0.8] active:opacity-[0.5]`
-                  : `opacity-[0.5]`
-              }`}
-              onClick={() => setPagination((state) => state + 1)}
+            </Button>
+            <Button
               disabled={
+                data &&
+                typeof data === "object" &&
+                data !== null &&
                 (data?.total_pages > 500 ? 500 : data?.total_pages) ===
-                pagination
+                  pagination
               }
+              onClick={() => setPagination((state) => state + 1)}
             >
               Next
-            </button>
+            </Button>
           </div>
 
           {/* Footer */}
