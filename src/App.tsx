@@ -3,6 +3,10 @@ import fetcher from "./utils/fetcher";
 import useSWR from "swr";
 import Button from "./components/button";
 
+/**
+ * Here we will declare the interface type that we will use to represent
+ * the response object received from the fetch library
+ */
 interface Data {
   results: Array<{
     id: number;
@@ -14,10 +18,20 @@ interface Data {
 }
 
 function App() {
+  /**
+   * Here we define the state to create the search feature
+   */
   const [search, setSearch] = useState("");
   const [searchKeyUp, setSearchKeyUp] = useState("");
   const [pagination, setPagination] = useState(1);
 
+  /**
+   * For the section here, we have a value that will return a url based 
+   * on the search value we input. if the value is empty, then we will 
+   * retrieve all data about popular films, but if we fill in a value 
+   * in the search input then we will retrieve 
+   * data based on the input value we entered.
+   */
   const url = useMemo(() => {
     const searchParam = new URLSearchParams();
     searchParam.set("page", pagination.toString());
@@ -33,6 +47,13 @@ function App() {
 
   const { data, isLoading } = useSWR<Data>(url, fetcher);
 
+  /**
+   * Here we will do the conditioning, in which we will wait for
+   *  one second since the last typing on the keyboard, then retrieve
+   *  data from the server. If before one second we type any button again, 
+   * it will cancel the previous one second, then wait for 1 second reset (reset).
+   *  Why ? because to prevent unnecessary requests and to save resources
+   */
   useEffect(() => {
     const timeout = setTimeout(() => {
       setSearchKeyUp(search);
@@ -78,6 +99,7 @@ function App() {
             </p>
           </div>
 
+          {/* Indicator Loading */}
           {isLoading && (
             <div className="w-full h-full flex justify-center items-center !my-[100px]">
               <svg
@@ -100,6 +122,7 @@ function App() {
           )}
 
           {/* Content */}
+          {/* show data only when not fetching data to server */}
           {!isLoading && (
             <div className="grid grid-cols-1 lg:grid-cols-2  xl:grid-cols-3 grid-rows-7 gap-[48px] !mt-[50px]">
               {Array.isArray(data?.results) &&
@@ -131,6 +154,9 @@ function App() {
           )}
 
           {/* Pagination */}
+          {/* Makes the button disabled, when the pagination value is 1 
+          for the previous button, and when the pagination value exceeds 
+          the data limit for the next button */}
           <div className="w-full h-full grid grid-cols-2 gap-[20px] justify-end">
             <Button
               disabled={pagination === 1}
